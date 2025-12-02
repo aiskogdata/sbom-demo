@@ -15,69 +15,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      - name: Run Dependency Review
-        uses: actions/dependency-review-action@v4
+      - name: Install Dependency Review CLI
+        run: npm install -g @github/dependency-review-cli
+
+      - name: Run Dependency Review and capture full summary
         id: review
-        with:
-          fail-on-severity: critical
-          allow-licenses: GPL-3.0, BSD-3-Clause, MIT
-          allow-ghsas: GHSA-abcd-1234-5679, GHSA-efgh-1234-5679
-          fail-on-scopes: development, runtime
-          output-file: dependency-review.json
-
-      - name: Prepare PR Comment Body
-        id: comment
         run: |
-          # Default message if file doesn't exist
-          if [ ! -f dependency-review.json ]; then
-            echo "body<<EOF" >> $GITHUB_OUTPUT
-            echo "### Dependency Review Results" >> $GITHUB_OUTPUT
-            echo "✅ No vulnerabilities, license issues, or OpenSSF Scorecard issues found." >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          # Extract data from JSON
-          VULNS=$(jq -r '.vulnerabilities | map("\(.packageName) \(.version) \(.severity)") | .[]?' dependency-review.json)
-          LICENSES=$(jq -r '.licenseIssues | map("\(.packageName) \(.license) \(.type)") | .[]?' dependency-review.json)
-          SCORECARD=$(jq -r '.scorecards | map("\(.package) \(.version) \(.score)") | .[]?' dependency-review.json)
-
-          echo "### Dependency Review Results" >> temp_comment.md
-
-          if [ -n "$VULNS" ]; then
-            echo "#### Vulnerabilities" >> temp_comment.md
-            echo '```' >> temp_comment.md
-            echo "$VULNS" >> temp_comment.md
-            echo '```' >> temp_comment.md
-          else
-            echo "✅ No vulnerabilities found." >> temp_comment.md
-          fi
-
-          if [ -n "$LICENSES" ]; then
-            echo "#### License Issues" >> temp_comment.md
-            echo '```' >> temp_comment.md
-            echo "$LICENSES" >> temp_comment.md
-            echo '```' >> temp_comment.md
-          else
-            echo "✅ No license issues found." >> temp_comment.md
-          fi
-
-          if [ -n "$SCORECARD" ]; then
-            echo "#### OpenSSF Scorecard" >> temp_comment.md
-            echo '```' >> temp_comment.md
-            echo "$SCORECARD" >> temp_comment.md
-            echo '```' >> temp_comment.md
-          else
-            echo "✅ OpenSSF Scorecard: all checks passed." >> temp_comment.md
-          fi
-
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          cat temp_comment.md >> $GITHUB_OUTPUT
+          mkdir -p dr_output
+          # Run the CLI, capture stdout including Scorecard
+          dr_output=$(npx @github/dependency-review-cli --fail-on-severity critical 2>&1)
+          echo "$dr_output"
+          # Save output for GitHub Actions step output
+          echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
+          echo "$dr_output" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Comment Dependency Review Results on PR
+      - name: Post Dependency Review summary as PR comment
         uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.comment.outputs.body }}
+          body: |
+            ### Dependency Review Summary
+            ```
+            ${{ steps.review.outputs.SUMMARY }}
+            ```
