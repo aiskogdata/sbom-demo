@@ -11,7 +11,7 @@ RUN apt-get update \
  && apt-get install -y curl git bash libc6 tzdata \
  && rm -rf /var/lib/apt/lists/*
 
-COPY SbomDemo.Api.csproj .
+COPY ./backend/SbomDemo.Api.csproj .
 RUN dotnet restore
 
 COPY . .
