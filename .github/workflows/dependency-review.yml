@@ -31,3 +31,5 @@ jobs:
         # ([String]). Block pull requests that introduce vulnerabilities in the scopes that match this list (optional)
         # Possible values: "development", "runtime", "unknown"
         fail-on-scopes: development, runtime
+        #possible values: always, on-failure, never
+        comment-summary-in-pr: always
