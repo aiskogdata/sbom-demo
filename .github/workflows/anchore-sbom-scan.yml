@@ -1,39 +1,30 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow checks out code, builds an image, performs a container image
-# scan with Anchore's Syft tool, and uploads the results to the GitHub Dependency
-# submission API.
-# For more information on the Anchore sbom-action usage
-# and parameters, see https://github.com/anchore/sbom-action. For more
-# information about the Anchore SBOM tool, Syft, see
-# https://github.com/anchore/syft
-name: Anchore Syft SBOM scan
+name: Generate SBOM
+
 on:
   push:
-    branches: [ "master" ]
-  workflow_dispatch: 
+    branches: [ first ]
+  pull_request:
+  workflow_dispatch:
+
 permissions:
   contents: write
+
 jobs:
-  Anchore-Build-Scan:
-    permissions:
-      contents: write # required to upload to the Dependency submission API
-      actions: read
+  sbom:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout the code
-      uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag localbuild/testimage:latest
-    - name: Set unique artifact name
-      id: artifact
-      run: |
-        echo "ARTIFACT_NAME=spdx.sbom.json" >> $GITHUB_ENV
-    - name: Scan the image and upload dependency results
-      uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a
-      with:
-        image: "localbuild/testimage:latest"
-        artifact-name:  ${{ env.ARTIFACT_NAME }}
-        dependency-snapshot: true
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate SBOM (Anchore)
+        uses: anchore/sbom-action@v0
+        with:
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
