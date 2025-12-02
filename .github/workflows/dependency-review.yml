@@ -32,6 +32,7 @@ jobs:
         # ([String]). Block pull requests that introduce vulnerabilities in the scopes that match this list (optional)
         # Possible values: "development", "runtime", "unknown"
         fail-on-scopes: development, runtime
+        output-file: dependency-review.json
         
     - name: Comment Dependency Review Results on PR
       uses: peter-evans/create-or-update-comment@v5
