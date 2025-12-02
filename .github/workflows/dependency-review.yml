@@ -17,15 +17,20 @@ jobs:
 
       - name: Install Dependency Review CLI
         run: npm install -g dependency-review-cli
-
+      
       - name: Run Dependency Review and capture full summary
         id: review
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}       # e.g., user/repo
+          GITHUB_REF: ${{ github.ref }}
         run: |
-          mkdir -p dr_output
-          # Run CLI, capture stdout/stderr, allow exit code != 0
-          dr_output=$(npx dependency-review-cli --fail-on-severity critical 2>&1 || true)
+          # Capture output even if CLI exits non-zero
+          dr_output=$(npx dependency-review-cli \
+            --fail-on-severity critical \
+            --owner "${GITHUB_REPOSITORY%%/*}" \
+            --repo "${GITHUB_REPOSITORY##*/}" \
+            2>&1 || true)
           echo "$dr_output"
-          # Save output for GitHub Actions step output
           echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
           echo "$dr_output" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
