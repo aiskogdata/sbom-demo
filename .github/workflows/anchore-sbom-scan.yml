@@ -1,10 +1,3 @@
-‎.github/workflows/anchore-syft.yml‎
-+44
-Lines changed: 44 additions & 0 deletions
-
-
-Original file line number	Diff line number	Diff line change
-@@ -0,0 +1,44 @@
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
