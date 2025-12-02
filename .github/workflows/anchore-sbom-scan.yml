@@ -23,12 +23,22 @@ jobs:
         with:
           format: spdx-json
           output-file: sbom.spdx.json
-
-      - name: Get artifact ID
+      
+      - name: Get SBOM artifact ID
         id: artifact
-        uses: octokit/request-action@v2
-        with:
-          route: GET /repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts
+        run: |
+          # Fetch artifacts for this workflow run
+          response=$(curl -s \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts")
+          
+          # Extract artifact ID for the one named "sbom"
+          ARTIFACT_ID=$(echo "$response" | jq -r '.artifacts[] | select(.name=="sbom") | .id')
+          
+          echo "artifact_id=$ARTIFACT_ID" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
       - name: Comment SBOM link on PR
