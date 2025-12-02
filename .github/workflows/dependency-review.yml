@@ -37,10 +37,15 @@ jobs:
       - name: Read Dependency Review Results
         id: read_review
         run: |
-          cat dependency-review.json
-          echo "REVIEW_JSON<<EOF" >> $GITHUB_OUTPUT
-          cat dependency-review.json >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          if [ -f dependency-review.json ]; then
+            echo "REVIEW_JSON<<EOF" >> $GITHUB_OUTPUT
+            cat dependency-review.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "REVIEW_JSON<<EOF" >> $GITHUB_OUTPUT
+            echo '{"message": "No dependencies detected."}' >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
 
       - name: Comment Dependency Review Results on PR
         uses: peter-evans/create-or-update-comment@v5
