@@ -29,8 +29,8 @@ jobs:
     - name: Set unique artifact name
       id: artifact
       run: |
-        TIMESTAMP=$(date +%Y%m%d%H%M%S)
-        echo "ARTIFACT_NAME=image_${TIMESTAMP}.spdx.sbom.json" >> $GITHUB_ENV
+        ID=$(github.head_ref)
+        echo "ARTIFACT_NAME=image_${ID}.spdx.sbom.json" >> $GITHUB_ENV
     - name: Scan the image and upload dependency results
       uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a
       with:
