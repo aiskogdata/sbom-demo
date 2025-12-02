@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Install Dependency Review CLI
-        run: npm install -g @github/dependency-review-cli
+        run: npm install -g dependency-review-cli
 
       - name: Run Dependency Review and capture full summary
         id: review
