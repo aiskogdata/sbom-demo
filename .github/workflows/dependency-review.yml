@@ -33,7 +33,16 @@ jobs:
         # Possible values: "development", "runtime", "unknown"
         fail-on-scopes: development, runtime
         output-file: dependency-review.json
-        
+
+
+    - name: Read Dependency Review Results
+      id: read_review
+      run: |
+        cat dependency-review.json
+        echo "REVIEW_JSON<<EOF" >> $GITHUB_OUTPUT
+        cat dependency-review.json >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+      
     - name: Comment Dependency Review Results on PR
       uses: peter-evans/create-or-update-comment@v5
       with:
@@ -41,6 +50,6 @@ jobs:
         issue-number: ${{ github.event.pull_request.number }}
         body: |
           ### Dependency Review Results
-          ```
-          ${{ steps.review.outputs.json-summary }}
+          ```json
+          ${{ steps.read_review.outputs.REVIEW_JSON }}
           ```
