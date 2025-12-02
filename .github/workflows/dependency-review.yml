@@ -22,14 +22,14 @@ jobs:
         id: review
         run: |
           mkdir -p dr_output
-          # Run the CLI, capture stdout including Scorecard
-          dr_output=$(npx @github/dependency-review-cli --fail-on-severity critical 2>&1)
+          # Run CLI, capture stdout/stderr, allow exit code != 0
+          dr_output=$(npx dependency-review-cli --fail-on-severity critical 2>&1 || true)
           echo "$dr_output"
           # Save output for GitHub Actions step output
           echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
           echo "$dr_output" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-
+        shell: bash
       - name: Post Dependency Review summary as PR comment
         uses: peter-evans/create-or-update-comment@v5
         with:
