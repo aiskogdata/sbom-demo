@@ -3,6 +3,7 @@ on: [pull_request]
 
 permissions:
   contents: read
+  pull-requests: write    # required to post comments
 
 jobs:
   dependency-review:
@@ -31,3 +32,14 @@ jobs:
         # ([String]). Block pull requests that introduce vulnerabilities in the scopes that match this list (optional)
         # Possible values: "development", "runtime", "unknown"
         fail-on-scopes: development, runtime
+        
+    - name: Comment Dependency Review Results on PR
+      uses: peter-evans/create-or-update-comment@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ### Dependency Review Results
+          ```
+          ${{ steps.review.outputs.json-summary }}
+          ```
