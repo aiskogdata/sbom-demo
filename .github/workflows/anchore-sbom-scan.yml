@@ -24,11 +24,18 @@ jobs:
           format: spdx-json
           output-file: sbom.spdx.json
 
+      - name: Get artifact ID
+        id: artifact
+        uses: octokit/request-action@v3
+        with:
+          route: GET /repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts
+
+
       - name: Comment SBOM link on PR
         uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            The latest SBOM is available here: [Download SBOM](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            The latest SBOM is available here: [Download SBOM](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact.outputs.data_id }})
 
