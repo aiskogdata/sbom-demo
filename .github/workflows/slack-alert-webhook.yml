@@ -43,6 +43,7 @@ jobs:
             echo "FINAL_MESSAGE=\`\`\`$MSG\`\`\`" >> $GITHUB_ENV
           else
             echo "FINAL_MESSAGE=No message provided" >> $GITHUB_ENV
+          fi
 
       # Send to Slack using the official action
       - name: Send Slack notification
