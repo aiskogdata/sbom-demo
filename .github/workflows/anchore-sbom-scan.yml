@@ -42,10 +42,12 @@ jobs:
 
 
       - name: Comment SBOM link on PR
+        if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             The latest SBOM is available here: [Download SBOM](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
 
