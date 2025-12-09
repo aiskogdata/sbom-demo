@@ -49,11 +49,14 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             The latest SBOM is available here: [Download SBOM](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          continue-on-error: true
 
       - name: Notify Slack
-        uses: ./.github/workflows/slack-notify.yml
+        if: github.event_name == 'workflow_dispatch'
+        uses: ./.github/workflows/slack-alert-webhook.yml
         with:
           message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ steps.artifact.outputs.artifact_id }}"
+        continue-on-error: true
 
 
 
