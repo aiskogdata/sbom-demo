@@ -54,6 +54,17 @@ jobs:
         env:
           MSG: ${{ inputs.message }}
 
+      - name: Debug webhook
+        run: |
+          if [ -z "${SLACK_WEBHOOK_URL}" ]; then
+            echo "Webhook is empty!"
+            exit 1
+          else
+            echo "Webhook is set"
+          fi
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
       # Send to Slack using the official action
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v2.1.1
