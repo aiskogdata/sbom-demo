@@ -50,13 +50,11 @@ jobs:
           body: |
             The latest SBOM is available here: [Download SBOM](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           continue-on-error: true
+    outputs:
+      artifact_id: ${{ steps.artifact.outputs.artifact_id }}
 
   notify-slack:
+      needs: sbom
       uses: ./.github/workflows/slack-alert-webhook.yml
       with:
-          message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ steps.artifact.outputs.artifact_id }}"
-      # - name: Notify Slack
-      #   uses: ./.github/workflows/slack-alert-webhook.yml
-      #   with:
-      #     message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ steps.artifact.outputs.artifact_id }}"
-      #   continue-on-error: true
+          message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ needs.sbom.outputs.artifact_id }}"
