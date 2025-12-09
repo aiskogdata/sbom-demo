@@ -14,6 +14,7 @@ on:
 jobs:
   run-lint:
     runs-on: ubuntu-latest
+    continue-on-error: true  
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,6 +26,6 @@ jobs:
         uses: github/super-linter@v4
         env:
           VALIDATE_ALL_CODEBASE: false
-          DISABLE_ERRORS: true
+          # DISABLE_ERRORS: true
           DEFAULT_BRANCH: "first"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
