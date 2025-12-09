@@ -57,6 +57,6 @@ jobs:
       needs: sbom
       uses: ./.github/workflows/slack-alert-webhook.yml
       with:
-          message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ needs.sbom.outputs.artifact_id }}"
+          message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       secrets:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
