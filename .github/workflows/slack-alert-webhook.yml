@@ -31,13 +31,16 @@ jobs:
 
       - name: Prepare message
         id: prepare
+        shell: bash
         run: |
           if [ -n "${{ inputs.message }}" ]; then
             echo "FINAL_MESSAGE=${{ inputs.message }}" >> $GITHUB_ENV
           elif [ -d "artifact_content" ]; then
-            echo "FINAL_MESSAGE=$(cat artifact_content/*)" >> $GITHUB_ENV
+            MSG=$(cat artifact_content/*)
+            echo "FINAL_MESSAGE=$MSG" >> $GITHUB_ENV
           else
             echo "FINAL_MESSAGE=No message provided" >> $GITHUB_ENV
+          fi
 
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.24.0
