@@ -55,6 +55,9 @@ jobs:
 
   notify-slack:
       needs: sbom
+      if: |
+        github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'schedule'
       uses: ./.github/workflows/slack-alert-webhook.yml
       with:
           message: "The latest SBOM is available here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
