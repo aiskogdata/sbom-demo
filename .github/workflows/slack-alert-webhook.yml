@@ -9,6 +9,9 @@ on:
       artifact-name:
         required: false
         type: string
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
   workflow_dispatch:
     inputs:
       message:
