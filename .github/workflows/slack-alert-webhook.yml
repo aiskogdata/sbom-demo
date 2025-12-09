@@ -22,13 +22,15 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact if provided
+      # Download artifact if specified
+      - name: Download artifact
         if: ${{ inputs.artifact-name }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
           path: artifact_content
 
+      # Prepare message
       - name: Prepare message
         id: prepare
         shell: bash
@@ -37,14 +39,15 @@ jobs:
             echo "FINAL_MESSAGE=${{ inputs.message }}" >> $GITHUB_ENV
           elif [ -d "artifact_content" ]; then
             MSG=$(cat artifact_content/*)
-            echo "FINAL_MESSAGE=$MSG" >> $GITHUB_ENV
+            # Wrap in triple backticks for Slack code block if artifact
+            echo "FINAL_MESSAGE=\`\`\`$MSG\`\`\`" >> $GITHUB_ENV
           else
             echo "FINAL_MESSAGE=No message provided" >> $GITHUB_ENV
-          fi
 
+      # Send to Slack using the official action
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@v2.1.1
-          with:
-            slack-message: ${{ env.FINAL_MESSAGE }}
-          env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          slack-message: ${{ env.FINAL_MESSAGE }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
