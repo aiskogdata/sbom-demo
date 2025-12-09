@@ -7,7 +7,7 @@ async function main() {
   console.log("Shuffled:", _.shuffle(nums))
 
   const res = await axios.get("https://jsonplaceholder.typicode.com/todos/1")
-  console.log("API data:", res.data)
+  console.log("API DATA:", res.data)
 }
 
 main()
