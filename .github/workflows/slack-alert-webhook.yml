@@ -43,7 +43,8 @@ jobs:
           fi
 
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          slack-message: ${{ env.FINAL_MESSAGE }}
+        uses: slackapi/slack-github-action@v2.1.1
+          with:
+            slack-message: ${{ env.FINAL_MESSAGE }}
+          env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
