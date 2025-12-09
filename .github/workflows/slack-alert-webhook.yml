@@ -43,15 +43,22 @@ jobs:
           else
             MSG="No message provided"
           fi
-          # Prepare full JSON payload and escape properly
-          PAYLOAD=$(python3 -c "import json; print(json.dumps({'text': '$MSG'}))")
+          # Escape message for JSON safely
+          PAYLOAD=$(python3 - <<EOF
+          import json, os
+          msg = os.environ['MSG']
+          print(json.dumps({"text": msg}))
+          EOF
+          )
           echo "PAYLOAD=$PAYLOAD" >> $GITHUB_ENV
+        env:
+          MSG: ${{ inputs.message }}
 
       # Send to Slack using the official action
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v2.1.1
         with:
           webhook-type: incoming-webhook
-          payload:  ${{ env.PAYLOAD }}
+          payload: ${{env.PAYLOAD}}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
