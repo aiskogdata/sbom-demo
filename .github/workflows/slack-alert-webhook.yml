@@ -36,22 +36,21 @@ jobs:
         shell: bash
         run: |
           if [ -n "${{ inputs.message }}" ]; then
-            echo "FINAL_MESSAGE=${{ inputs.message }}" >> $GITHUB_ENV
+            MSG="${{ inputs.message }}"
           elif [ -d "artifact_content" ]; then
             MSG=$(cat artifact_content/*)
-            # Wrap in triple backticks for Slack code block if artifact
-            echo "FINAL_MESSAGE=\`\`\`$MSG\`\`\`" >> $GITHUB_ENV
+            MSG="```$MSG```"
           else
-            echo "FINAL_MESSAGE=No message provided" >> $GITHUB_ENV
+            MSG="No message provided"
           fi
+          # Prepare full JSON payload and escape properly
+          PAYLOAD=$(python3 -c "import json; print(json.dumps({'text': '$MSG'}))")
+          echo "PAYLOAD=$PAYLOAD" >> $GITHUB_ENV
 
       # Send to Slack using the official action
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v2.1.1
         with:
-          payload: |
-            {
-              "text": ${{ env.PAYLOAD }}
-            }
+          payload:  ${{ env.PAYLOAD }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
