@@ -1,0 +1,30 @@
+name: Lint Once
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: lint
+        uses: super-linter/super-linter@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISABLE_ERRORS: true
+          OUTPUT_DETAILS: detailed
+
+      - name: Comment results once
+        if: always()
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Super-Linter has completed initial checks.
+            View details in the "Lint Once" workflow run.
+          edit-mode: create
