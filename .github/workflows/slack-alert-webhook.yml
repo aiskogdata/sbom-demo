@@ -1,0 +1,46 @@
+name: Slack Notify
+
+on:
+  workflow_call:
+    inputs:
+      message:
+        required: false
+        type: string
+      artifact-name:
+        required: false
+        type: string
+  workflow_dispatch:
+    inputs:
+      message:
+        required: false
+        type: string
+      artifact-name:
+        required: false
+        type: string
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact if provided
+        if: ${{ inputs.artifact-name }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: artifact_content
+
+      - name: Prepare message
+        id: prepare
+        run: |
+          if [ -n "${{ inputs.message }}" ]; then
+            echo "FINAL_MESSAGE=${{ inputs.message }}" >> $GITHUB_ENV
+          elif [ -d "artifact_content" ]; then
+            echo "FINAL_MESSAGE=$(cat artifact_content/*)" >> $GITHUB_ENV
+          else
+            echo "FINAL_MESSAGE=No message provided" >> $GITHUB_ENV
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          slack-message: ${{ env.FINAL_MESSAGE }}
