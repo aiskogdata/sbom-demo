@@ -27,4 +27,4 @@ jobs:
           body: |
             Super-Linter has completed initial checks.
             View details in the "Lint Once" workflow run.
-          edit-mode: create
+          edit-mode: replace
