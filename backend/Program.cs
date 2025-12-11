@@ -47,39 +47,6 @@
                 return Results.Ok(json);
             });
     
-            // --- LINTER BAIT BELOW ---
-    
-            // Unused variable
-            var unusedValue = 123;
-            
-            // Dead code + unreachable statement
-            if (false)
-            {
-                Console.WriteLine("This will never run");
-            }
-            
-            // Empty catch block
-            try
-            {
-                throw new InvalidOperationException("boom");
-            }
-            catch
-            {
-            }
-            
-            // Async method called without await (generates warning)
-            static async Task<string> FetchDataAsync()
-            {
-                await Task.Delay(10);
-                return "data";
-            }
-            var result = FetchDataAsync(); // not awaited
-            
-            // Magic number + unused private method
-            static int DoSomething(int x) => x * 42;
-            DoSomething(7);
-            
-            // --- END LINTER BAIT ---
     
     
             app.Run();
