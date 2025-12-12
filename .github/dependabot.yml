@@ -1,7 +1,13 @@
 version: 2
 updates:
-  - package-ecosystem: nuget
-    directory: "/"
+  - package-ecosystem: "nuget"
+    directory: "/"         # scans every subdirectory for .csproj
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+    open-pull-requests-limit: 1
+    groups:
+      all:
+        patterns:
+          - "*"
