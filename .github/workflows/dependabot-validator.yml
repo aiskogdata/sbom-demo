@@ -7,6 +7,7 @@ on:
       - '.github/workflows/dependabot-validate.yml'
 jobs:
   validate:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
