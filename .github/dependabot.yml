@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "cron"
-      cronjob: "10 9 * * *"
+      cronjob: "30 12 * * *"
 
     ignore:
       - dependency-name: "Duende.*"
