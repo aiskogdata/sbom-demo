@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "cron"
+      cronjob: "10 9 * * *"
+
+    ignore:
+      - dependency-name: "Duende.*"
+
+    groups:
+      microsoft:
+        patterns:
+          - "Microsoft.*"
+          - "System.*"        # optional, add/remove depending on what you consider MS-owned
+      others:
+        patterns:
+          - "*"               # everything else
+        exclude-patterns:
+          - "Microsoft.*"
+          - "System.*"
+          - "Duende.*"
