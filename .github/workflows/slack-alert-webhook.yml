@@ -1,0 +1,78 @@
+name: Slack Notify
+
+on:
+  workflow_call:
+    inputs:
+      message:
+        required: false
+        type: string
+      artifact-name:
+        required: false
+        type: string
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
+  workflow_dispatch:
+    inputs:
+      message:
+        required: false
+        type: string
+      artifact-name:
+        required: false
+        type: string
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      # Download artifact if specified
+      - name: Download artifact
+        if: ${{ inputs.artifact-name }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: artifact_content
+
+      # Prepare message
+      - name: Prepare message
+        id: prepare
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.message }}" ]; then
+            MSG="${{ inputs.message }}"
+          elif [ -d "artifact_content" ]; then
+            MSG=$(cat artifact_content/*)
+            MSG="```$MSG```"
+          else
+            MSG="No message provided"
+          fi
+          # Escape message for JSON safely
+          PAYLOAD=$(python3 - <<EOF
+          import json, os
+          msg = os.environ['MSG']
+          print(json.dumps({"text": msg}))
+          EOF
+          )
+          echo "PAYLOAD=$PAYLOAD" >> $GITHUB_ENV
+        env:
+          MSG: ${{ inputs.message }}
+
+      - name: Debug webhook
+        run: |
+          if [ -z "${SLACK_WEBHOOK_URL}" ]; then
+            echo "Webhook is empty!"
+            exit 1
+          else
+            echo "Webhook is set"
+          fi
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # Send to Slack using the official action
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook-type: incoming-webhook
+          payload: ${{env.PAYLOAD}}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
